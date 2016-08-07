@@ -2,9 +2,9 @@
 
 # -- COMP9517 16s2 Assignment 1: Digital Art
 # This program produces an "oil paint" effect on images. To do this,
-# it does 3 tasks sequentially:
-#	1. pixel-by-pixel mathematical operation
-#	2. convolution mask for most frequent pixel value
+# it does 3 operations sequentially:
+#	1. Pixel-by-pixel mathematical operation
+#	2. Convolution mask for most frequent pixel value
 #	3. Average intensities of pixels
 #
 # Written by: Ian Wong
@@ -38,30 +38,39 @@ def main(image_filename):
 
 	# Conduct task 1
 	task1_img = task1(img)
+#	cv2.imwrite("_task1.png", task1_img)
 
 	# Conduct task 2
 	task2_img = task2(task1_img)
-	output_filename = os.path.splitext(image_filename)[0] + "_task2.png"
-	cv2.imwrite(output_filename, task1_img)	
+	cv2.imwrite("_task2.png",task2_img)
 
-	# Output final image
-	outputfilename = os.path.splitext(image_filename)[0] + "_oiled.png"
-	cv2.imwrite(output_filename, task3_img)
+	# Conduct task 3
+#	task3_img = task3(task2_img)
+#	cv2.imwrite("_task3.png", task3_img)
+
+	# Additional effect - Gaussian Blur
+#	blurred = gaussian_blur(task3_img)
+#	cv2.imwrite("_opt.png", blurred)
 
 # Convert an image to greyscale
 def conv_greyscale(img):
 	return cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
 
+# Blur an image using the gaussian kernel
+def gaussian_blur(img):
+	print "Blurring image using Gaussian Kernel..."
+	return cv2.GaussianBlur(img, (5,5), 0)		# (5,5) is size of kernel; 0 is std_dev of x and y
+
 # Task 1: Changes each pixel using the formula:
 #	I = 0.299r + 0.587g + 0.114b
 def task1(img):
+	print "Conducting task 1..."
 	proc_img = img.copy()
 	
 	# obtain dimensions of image
 	height, width, depth = img.shape
-	img = np.reshape(img, (height,width,depth))	# convert to array for fast iteration
-	for i in range(0,height):
-		for j in range(0,width):
+	for i in range(0, height):
+		for j in range(0, width):
 
 			# Obtain pixel RGB values
 			r = img[i][j][IMG_PIXEL_RED]
@@ -70,31 +79,59 @@ def task1(img):
 
 			proc_img[i][j] = 0.299*r + 0.587*g + 0.114*b
 
-	# DEBUGGING - output image
-	cv2.imwrite("_task1.png", proc_img)
-
 	return proc_img
 
 # Task 2: Application of a convolution mask that determines 
 #	  the most frequent pixel value
 def task2(img):
+	print "Conducting task 2..."
 	proc_img = img.copy()
 
-	# Do some processing
-
-	# DEBUGGING - output image
-	cv2.imwrite("_task2.png",proc_img)
+	# Obtain dimensions of image
+	height, width, depth = img.shape
+	for i in range(0, height):
+		for j in range(0, width):
+			# Get value of pixel (at i,j) and its neighbours
+			neighbour_vals = get_neighbours(img, (3,3), (i,j))	# 3x3 mask
+			
+			# Get most frequent pixel value
+			most_freq_val = get_most_freq_val(neighbour_vals)
+	
+			# Set pixel value to be most frequent pixel value
+			proc_img[i][j] = most_freq_val
 
 	return proc_img
 
+# Obtains the neighbouring pixel values as an array
+# NOTE: Assumes mask dimensions are odd, and pixel_loc is valid
+def get_neighbours(img, mask_dim, pixel_loc):
+	neighbours = []
+
+	# Obtain necessary dimensions
+	mask_height, mask_width = mask_dim
+	img_height, img_width, img_depth = img.shape
+	pixel_x, pixel_y = pixel_loc
+	
+	# Iterate over mask region, with pixel at centre of mask
+	for i in range(pixel_x - mask_height/2, pixel_x + mask_height/2 + 1):
+		if (i >= 0) and (i < img_height):			# check for height bounded
+			for j in range(pixel_y - mask_width/2, pixel_y + mask_width/2 + 1):
+				if (j >= 0) and (j < img_width):	# check for width bounded
+					neighbours.append(img[i][j][0])
+			
+	return neighbours
+	
+
+# Obtains the most frequent value in an array
+def get_most_freq_val(values):
+	return np.bincount(values).argmax()
+
 # Task 3: Achieves the 'oil paint' effect
 def task3(img):
+	print "Conducting task 3..."
 	proc_img = img.copy()
 
 	# Do some processing
-
-	# DEBUGGING - output image
-	cv2.imwrite("_task3.png",proc_img)
 
 	return proc_img
 
