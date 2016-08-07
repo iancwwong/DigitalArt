@@ -12,8 +12,9 @@
 # -------------------------
 # IMPORTS
 # -------------------------
+import cv2	# image processing
 import sys
-import cv2
+import os
 
 # -------------------------
 # FUNCTIONS
@@ -28,13 +29,21 @@ def main(image_filename):
 	img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
 
 	# Output image
-	cv2.imwrite(image_filename + "_gray.png", img)
+	output_filename = os.path.splitext(image_filename)[0] + "_gray.png"
+	cv2.imwrite(output_filename, img)
 	
 
 # ------------------------------------
 if (__name__ == "__main__"):
+
+	# Check correct program usage
 	if len(sys.argv) < 2:
 		print "Usage: python artistic.py <image file>"
+		exit()
+
+	# Check image file exists
+	elif not os.path.exists(sys.argv[1]):
+		print "Error: File '" + sys.argv[1] + "' not found."
 		exit()
 
 	main(sys.argv[1])
