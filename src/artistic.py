@@ -10,11 +10,16 @@
 # Date started: 7/8/2016
 
 # -------------------------
+# IMPORTS
+# -------------------------
+import sys
+import cv2
+
+# -------------------------
 # FUNCTIONS
 # -------------------------
-
 # Main program
-def main():
+def main(image_filename):
 
 	# Read image file
 	pass
@@ -25,4 +30,4 @@ if (__name__ == "__main__"):
 		print "Usage: python artistic.py <image file>"
 		exit()
 
-	main()
+	main(sys.argv[1])
