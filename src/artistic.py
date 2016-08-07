@@ -21,8 +21,15 @@ import cv2
 # Main program
 def main(image_filename):
 
-	# Read image file
-	pass
+	# Open image file
+	img = cv2.imread(image_filename)
+
+	# Convert to greyscale
+	img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+
+	# Output image
+	cv2.imwrite(image_filename + "_gray.png", img)
+	
 
 # ------------------------------------
 if (__name__ == "__main__"):
