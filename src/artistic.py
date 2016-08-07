@@ -38,7 +38,7 @@ def main(image_filename):
 
 	# Conduct task 1
 	task1_img = task1(img)
-#	cv2.imwrite("_task1.png", task1_img)
+	cv2.imwrite("_task1.png", task1_img)
 
 	# Conduct task 2
 	task2_img = task2(task1_img)
@@ -73,11 +73,15 @@ def task1(img):
 		for j in range(0, width):
 
 			# Obtain pixel RGB values
-			r = img[i][j][IMG_PIXEL_RED]
-			g = img[i][j][IMG_PIXEL_GREEN]
-			b = img[i][j][IMG_PIXEL_BLUE]
+			r = img.item(i,j,IMG_PIXEL_RED)
+			g = img.item(i,j,IMG_PIXEL_GREEN)	
+			b = img.item(i,j,IMG_PIXEL_BLUE)
 
-			proc_img[i][j] = 0.299*r + 0.587*g + 0.114*b
+			# Set new pixel value
+			new_pixel_val = 0.299*r + 0.587*g + 0.114*b
+			proc_img.itemset((i,j,0),new_pixel_val)			# optimised access method
+			proc_img.itemset((i,j,1),new_pixel_val)
+			proc_img.itemset((i,j,2),new_pixel_val)
 
 	return proc_img
 
@@ -98,12 +102,14 @@ def task2(img):
 			most_freq_val = get_most_freq_val(neighbour_vals)
 	
 			# Set pixel value to be most frequent pixel value
-			proc_img[i][j] = most_freq_val
+			proc_img.itemset((i,j,0),most_freq_val)
+			proc_img.itemset((i,j,1),most_freq_val)
+			proc_img.itemset((i,j,2),most_freq_val)
 
 	return proc_img
 
 # Obtains the neighbouring pixel values as an array
-# NOTE: Assumes mask dimensions are odd, and pixel_loc is valid
+# NOTE: Assumes mask dimensions are odd, pixel_loc is valid, and img is a GREYSCALE image
 def get_neighbours(img, mask_dim, pixel_loc):
 	neighbours = []
 
@@ -117,7 +123,7 @@ def get_neighbours(img, mask_dim, pixel_loc):
 		if (i >= 0) and (i < img_height):			# check for height bounded
 			for j in range(pixel_y - mask_width/2, pixel_y + mask_width/2 + 1):
 				if (j >= 0) and (j < img_width):	# check for width bounded
-					neighbours.append(img[i][j][0])
+					neighbours.append(img.item(i,j,0))
 			
 	return neighbours
 	
